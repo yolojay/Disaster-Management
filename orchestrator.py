@@ -6,7 +6,7 @@ Disaster Response Briefing.
 
 from __future__ import annotations
 import concurrent.futures
-from typing import Any
+from typing import Any, List, Optional
 
 from agents import cyclone_prediction, fishermen_alert, evacuation_planning
 from agents import resource_coordination, damage_assessment
@@ -75,7 +75,7 @@ def run_pre_landfall(
     available_ndrf_teams: int,
     nearest_depot_km: float,
     fleet_count: int = 0,
-    active_fishing_zones: list[str] | None = None,
+    active_fishing_zones: Optional[List[str]] = None,
 ) -> dict:
     """
     Run all pre-landfall agents concurrently and return fused briefing.

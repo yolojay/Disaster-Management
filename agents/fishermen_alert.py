@@ -4,6 +4,7 @@ Generates targeted alerts for fishing communities based on storm data,
 active fishing zones, boat types, and current fleet positions.
 """
 
+from typing import List, Optional
 from watsonx_client import generate
 
 
@@ -25,7 +26,7 @@ def run(
     landfall_location: str,
     max_wind_kmh: float,
     wave_height_m: float,
-    active_fishing_zones: list[str] | None = None,
+    active_fishing_zones: Optional[List[str]] = None,
     fleet_count: int = 0,
     additional_context: str = "",
 ) -> dict:

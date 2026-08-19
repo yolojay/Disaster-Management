@@ -19,6 +19,17 @@ from agents import (
     resource_coordination,
     damage_assessment,
 )
+from watsonx_client import WatsonxError
+
+
+def _handle(fn):
+    """Run an agent callable, mapping WatsonxError → 503, anything else → 500."""
+    try:
+        return fn()
+    except WatsonxError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"{type(exc).__name__}: {exc}")
 
 app = FastAPI(
     title="AI-Driven Cyclone & Coastal Disaster Early Warning System",
@@ -143,94 +154,79 @@ class PostLandfallRequest(BaseModel):
 @app.post("/agents/cyclone-prediction", tags=["Agents"])
 def api_cyclone_prediction(req: CyclonePredictionRequest):
     """Agent 1 — Cyclone Track & Intensity Prediction"""
-    try:
-        return cyclone_prediction.run(
-            sea_surface_temp_c=req.sea_surface_temp_c,
-            central_pressure_hpa=req.central_pressure_hpa,
-            max_wind_speed_kmh=req.max_wind_speed_kmh,
-            lat=req.lat,
-            lon=req.lon,
-            storm_name=req.storm_name,
-            additional_context=req.additional_context or "",
-        )
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+    return _handle(lambda: cyclone_prediction.run(
+        sea_surface_temp_c=req.sea_surface_temp_c,
+        central_pressure_hpa=req.central_pressure_hpa,
+        max_wind_speed_kmh=req.max_wind_speed_kmh,
+        lat=req.lat,
+        lon=req.lon,
+        storm_name=req.storm_name,
+        additional_context=req.additional_context or "",
+    ))
 
 
 @app.post("/agents/fishermen-alert", tags=["Agents"])
 def api_fishermen_alert(req: FishermenAlertRequest):
     """Agent 2 — Fishermen Safety Alert"""
-    try:
-        return fishermen_alert.run(
-            storm_name=req.storm_name,
-            hours_to_landfall=req.hours_to_landfall,
-            landfall_location=req.landfall_location,
-            max_wind_kmh=req.max_wind_kmh,
-            wave_height_m=req.wave_height_m,
-            active_fishing_zones=req.active_fishing_zones,
-            fleet_count=req.fleet_count,
-            additional_context=req.additional_context or "",
-        )
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+    return _handle(lambda: fishermen_alert.run(
+        storm_name=req.storm_name,
+        hours_to_landfall=req.hours_to_landfall,
+        landfall_location=req.landfall_location,
+        max_wind_kmh=req.max_wind_kmh,
+        wave_height_m=req.wave_height_m,
+        active_fishing_zones=req.active_fishing_zones,
+        fleet_count=req.fleet_count,
+        additional_context=req.additional_context or "",
+    ))
 
 
 @app.post("/agents/evacuation-plan", tags=["Agents"])
 def api_evacuation_plan(req: EvacuationRequest):
     """Agent 3 — Evacuation Route Planning"""
-    try:
-        return evacuation_planning.run(
-            storm_name=req.storm_name,
-            district=req.district,
-            state=req.state,
-            population_at_risk=req.population_at_risk,
-            hours_to_landfall=req.hours_to_landfall,
-            inundation_zone_km=req.inundation_zone_km,
-            available_shelters=req.available_shelters,
-            shelter_capacity=req.shelter_capacity,
-            additional_context=req.additional_context or "",
-        )
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+    return _handle(lambda: evacuation_planning.run(
+        storm_name=req.storm_name,
+        district=req.district,
+        state=req.state,
+        population_at_risk=req.population_at_risk,
+        hours_to_landfall=req.hours_to_landfall,
+        inundation_zone_km=req.inundation_zone_km,
+        available_shelters=req.available_shelters,
+        shelter_capacity=req.shelter_capacity,
+        additional_context=req.additional_context or "",
+    ))
 
 
 @app.post("/agents/resource-coordination", tags=["Agents"])
 def api_resource_coordination(req: ResourceCoordinationRequest):
     """Agent 4 — Relief Resource Coordination"""
-    try:
-        return resource_coordination.run(
-            storm_name=req.storm_name,
-            affected_districts=req.affected_districts,
-            total_population_affected=req.total_population_affected,
-            storm_category=req.storm_category,
-            hours_to_landfall=req.hours_to_landfall,
-            available_ndrf_teams=req.available_ndrf_teams,
-            nearest_depot_km=req.nearest_depot_km,
-            additional_context=req.additional_context or "",
-        )
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+    return _handle(lambda: resource_coordination.run(
+        storm_name=req.storm_name,
+        affected_districts=req.affected_districts,
+        total_population_affected=req.total_population_affected,
+        storm_category=req.storm_category,
+        hours_to_landfall=req.hours_to_landfall,
+        available_ndrf_teams=req.available_ndrf_teams,
+        nearest_depot_km=req.nearest_depot_km,
+        additional_context=req.additional_context or "",
+    ))
 
 
 @app.post("/agents/damage-assessment", tags=["Agents"])
 def api_damage_assessment(req: DamageAssessmentRequest):
     """Agent 5 — Post-Disaster Damage Assessment"""
-    try:
-        return damage_assessment.run(
-            storm_name=req.storm_name,
-            landfall_location=req.landfall_location,
-            storm_category=req.storm_category,
-            hours_since_landfall=req.hours_since_landfall,
-            reported_casualties=req.reported_casualties,
-            houses_damaged=req.houses_damaged,
-            roads_blocked_km=req.roads_blocked_km,
-            power_outage_villages=req.power_outage_villages,
-            crop_loss_hectares=req.crop_loss_hectares,
-            boats_damaged=req.boats_damaged,
-            additional_context=req.additional_context or "",
-        )
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+    return _handle(lambda: damage_assessment.run(
+        storm_name=req.storm_name,
+        landfall_location=req.landfall_location,
+        storm_category=req.storm_category,
+        hours_since_landfall=req.hours_since_landfall,
+        reported_casualties=req.reported_casualties,
+        houses_damaged=req.houses_damaged,
+        roads_blocked_km=req.roads_blocked_km,
+        power_outage_villages=req.power_outage_villages,
+        crop_loss_hectares=req.crop_loss_hectares,
+        boats_damaged=req.boats_damaged,
+        additional_context=req.additional_context or "",
+    ))
 
 
 # ============================================================
@@ -239,64 +235,53 @@ def api_damage_assessment(req: DamageAssessmentRequest):
 
 @app.post("/orchestrate/pre-landfall", tags=["Orchestrator"])
 def api_pre_landfall(req: PreLandfallRequest):
-    """
-    Run all pre-landfall agents in parallel and return fused Executive Briefing.
-    Calls: Cyclone Prediction + Fishermen Alert + Evacuation Plan + Resource Coordination
-    """
-    try:
-        return orchestrator.run_pre_landfall(
-            storm_name=req.storm_name,
-            lat=req.lat,
-            lon=req.lon,
-            sea_surface_temp_c=req.sea_surface_temp_c,
-            central_pressure_hpa=req.central_pressure_hpa,
-            max_wind_kmh=req.max_wind_kmh,
-            hours_to_landfall=req.hours_to_landfall,
-            landfall_location=req.landfall_location,
-            wave_height_m=req.wave_height_m,
-            district=req.district,
-            state=req.state,
-            population_at_risk=req.population_at_risk,
-            inundation_zone_km=req.inundation_zone_km,
-            available_shelters=req.available_shelters,
-            shelter_capacity=req.shelter_capacity,
-            affected_districts=req.affected_districts,
-            total_population_affected=req.total_population_affected,
-            storm_category=req.storm_category,
-            available_ndrf_teams=req.available_ndrf_teams,
-            nearest_depot_km=req.nearest_depot_km,
-            fleet_count=req.fleet_count,
-            active_fishing_zones=req.active_fishing_zones,
-        )
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+    """Run all pre-landfall agents in parallel — Cyclone + Fishermen + Evacuation + Resources."""
+    return _handle(lambda: orchestrator.run_pre_landfall(
+        storm_name=req.storm_name,
+        lat=req.lat,
+        lon=req.lon,
+        sea_surface_temp_c=req.sea_surface_temp_c,
+        central_pressure_hpa=req.central_pressure_hpa,
+        max_wind_kmh=req.max_wind_kmh,
+        hours_to_landfall=req.hours_to_landfall,
+        landfall_location=req.landfall_location,
+        wave_height_m=req.wave_height_m,
+        district=req.district,
+        state=req.state,
+        population_at_risk=req.population_at_risk,
+        inundation_zone_km=req.inundation_zone_km,
+        available_shelters=req.available_shelters,
+        shelter_capacity=req.shelter_capacity,
+        affected_districts=req.affected_districts,
+        total_population_affected=req.total_population_affected,
+        storm_category=req.storm_category,
+        available_ndrf_teams=req.available_ndrf_teams,
+        nearest_depot_km=req.nearest_depot_km,
+        fleet_count=req.fleet_count,
+        active_fishing_zones=req.active_fishing_zones,
+    ))
 
 
 @app.post("/orchestrate/post-landfall", tags=["Orchestrator"])
 def api_post_landfall(req: PostLandfallRequest):
-    """
-    Run post-landfall agents: Damage Assessment + Resource Coordination → fused briefing.
-    """
-    try:
-        return orchestrator.run_post_landfall(
-            storm_name=req.storm_name,
-            landfall_location=req.landfall_location,
-            storm_category=req.storm_category,
-            hours_since_landfall=req.hours_since_landfall,
-            reported_casualties=req.reported_casualties,
-            houses_damaged=req.houses_damaged,
-            roads_blocked_km=req.roads_blocked_km,
-            power_outage_villages=req.power_outage_villages,
-            crop_loss_hectares=req.crop_loss_hectares,
-            boats_damaged=req.boats_damaged,
-            affected_districts=req.affected_districts,
-            total_population_affected=req.total_population_affected,
-            available_ndrf_teams=req.available_ndrf_teams,
-            nearest_depot_km=req.nearest_depot_km,
-            additional_context=req.additional_context or "",
-        )
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+    """Run post-landfall agents: Damage Assessment + Resource Coordination → fused briefing."""
+    return _handle(lambda: orchestrator.run_post_landfall(
+        storm_name=req.storm_name,
+        landfall_location=req.landfall_location,
+        storm_category=req.storm_category,
+        hours_since_landfall=req.hours_since_landfall,
+        reported_casualties=req.reported_casualties,
+        houses_damaged=req.houses_damaged,
+        roads_blocked_km=req.roads_blocked_km,
+        power_outage_villages=req.power_outage_villages,
+        crop_loss_hectares=req.crop_loss_hectares,
+        boats_damaged=req.boats_damaged,
+        affected_districts=req.affected_districts,
+        total_population_affected=req.total_population_affected,
+        available_ndrf_teams=req.available_ndrf_teams,
+        nearest_depot_km=req.nearest_depot_km,
+        additional_context=req.additional_context or "",
+    ))
 
 
 # ============================================================
@@ -316,3 +301,10 @@ def health():
 def index():
     with open("static/index.html", "r", encoding="utf-8") as f:
         return HTMLResponse(content=f.read())
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    from fastapi.responses import Response
+    ico = b"\x00\x00\x01\x00\x01\x00\x01\x01\x00\x00\x01\x00\x18\x00\x30\x00\x00\x00\x16\x00\x00\x00\x28\x00\x00\x00\x01\x00\x00\x00\x02\x00\x00\x00\x01\x00\x18\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff\xff\x00\x00\x00\x00\x00"
+    return Response(content=ico, media_type="image/x-icon")

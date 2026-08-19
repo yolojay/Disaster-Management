@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Contact — AI Cyclone EWS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/static/css/shared.css"/>
+<style>
+.contact-hero { padding:80px 40px 48px; max-width:1200px; margin:0 auto }
+.contact-hero h1 { font-size:clamp(28px,4vw,46px); font-weight:900; margin-bottom:14px }
+.contact-grid { display:grid; grid-template-columns:1fr 1.4fr; gap:40px; max-width:1200px; margin:0 auto; padding:0 40px 80px }
+@media(max-width:900px) { .contact-grid { grid-template-columns:1fr } }
+
+.contact-info { display:flex; flex-direction:column; gap:20px }
+.ci-card { background:rgba(10,22,40,.8); border:1px solid var(--border); border-radius:var(--r-xl); padding:24px; display:flex; align-items:flex-start; gap:16px }
+.ci-icon { font-size:28px; flex-shrink:0 }
+.ci-label { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px }
+.ci-val { font-size:14px; color:var(--text2); line-height:1.6 }
+
+.contact-form-card { background:rgba(10,22,40,.8); border:1px solid var(--border); border-radius:var(--r-xl); padding:32px }
+.contact-form-card h2 { font-size:20px; font-weight:800; margin-bottom:6px }
+.contact-form-card p { font-size:13px; color:var(--muted); margin-bottom:24px }
+
+.live-panel { background:linear-gradient(135deg,rgba(6,182,212,.06) 0%,rgba(59,130,246,.04) 100%); border:1px solid rgba(6,182,212,.25); border-radius:var(--r-xl); padding:24px; margin-top:auto }
+.live-panel-title { font-size:13px; font-weight:800; color:var(--cyan); margin-bottom:10px }
+.live-panel p { font-size:13px; color:var(--text2); line-height:1.7; margin-bottom:16px }
+</style>
+</head>
+<body>
+<nav id="topnav">
+  <a class="nav-logo" href="/static/index.html">
+    <span class="nav-logo-icon">🌪️</span>
+    <div class="nav-logo-text">AI Cyclone &amp; Coastal<br><span>Disaster Early Warning System</span></div>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="/static/index.html">Home</a>
+    <a class="nav-link" href="/static/agents.html">AI Agents</a>
+    <a class="nav-link" href="/static/dashboard.html">Dashboard</a>
+    <a class="nav-link" href="/static/reports.html">Reports</a>
+    <a class="nav-link" href="/static/about.html">About</a>
+    <a class="nav-link active" href="/static/contact.html">Contact</a>
+  </div>
+  <div class="nav-spacer"></div>
+  <div class="nav-status"><div class="nav-dot"></div>System Operational</div>
+  <a class="nav-cta" href="/static/dashboard.html">⚡ Dashboard</a>
+  <button id="nav-hamburger">☰</button>
+</nav>
+<div id="nav-mobile">
+  <a class="nav-link" href="/static/index.html">Home</a>
+  <a class="nav-link" href="/static/agents.html">AI Agents</a>
+  <a class="nav-link" href="/static/dashboard.html">Dashboard</a>
+  <a class="nav-link" href="/static/reports.html">Reports</a>
+  <a class="nav-link" href="/static/about.html">About</a>
+  <a class="nav-link active" href="/static/contact.html">Contact</a>
+</div>
+
+<div class="page-wrap">
+  <div class="contact-hero">
+    <div class="sec-label">Get in Touch</div>
+    <h1>Contact <span class="gradient-text">Us</span></h1>
+    <p class="sec-sub">Questions about the project, collaboration opportunities, or deployment enquiries — reach out via any of the channels below.</p>
+  </div>
+
+  <div class="contact-grid">
+    <div class="contact-info">
+      <div class="ci-card">
+        <div class="ci-icon">🏆</div>
+        <div>
+          <div class="ci-label">Project</div>
+          <div class="ci-val">AI Cyclone &amp; Coastal Disaster Early Warning System · IBM Hackathon 2026</div>
+        </div>
+      </div>
+      <div class="ci-card">
+        <div class="ci-icon">🔷</div>
+        <div>
+          <div class="ci-label">Platform</div>
+          <div class="ci-val">IBM watsonx.ai · Granite-4-h-small · eu-de region · IAM Authentication</div>
+        </div>
+      </div>
+      <div class="ci-card">
+        <div class="ci-icon">🤖</div>
+        <div>
+          <div class="ci-label">Architecture</div>
+          <div class="ci-val">5 Specialist AI Agents · Parallel Orchestration · FastAPI REST API · Python 3.12</div>
+        </div>
+      </div>
+      <div class="ci-card">
+        <div class="ci-icon">🌊</div>
+        <div>
+          <div class="ci-label">Use Case</div>
+          <div class="ci-val">Coastal disaster early warning · Bay of Bengal · India · 8.4M residents protected</div>
+        </div>
+      </div>
+      <div class="ci-card">
+        <div class="ci-icon">🔗</div>
+        <div>
+          <div class="ci-label">Project Links</div>
+          <div class="ci-val">
+            <a href="http://localhost:8000/docs" style="color:var(--cyan)" target="_blank">API Documentation (Swagger)</a><br>
+            <a href="/static/about.html" style="color:var(--cyan)">About the Project</a><br>
+            <a href="/static/dashboard.html" style="color:var(--cyan)">Launch Dashboard</a>
+          </div>
+        </div>
+      </div>
+      <div class="live-panel">
+        <div class="live-panel-title">🚀 Try It Live</div>
+        <p>The AI command center is live. Launch the dashboard to run any of the 5 IBM Granite-powered agents — or fire the full parallel orchestration with a single click.</p>
+        <a class="btn btn-primary" href="/static/dashboard.html">Open Command Center →</a>
+      </div>
+    </div>
+
+    <div class="contact-form-card">
+      <h2>Send a Message</h2>
+      <p>Fill in the form and we'll get back to you about the project.</p>
+      <div class="form-group">
+        <label class="form-label">Your Name</label>
+        <input class="form-input" placeholder="Enter your name"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" placeholder="your@email.com"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Subject</label>
+        <select class="form-select">
+          <option>General Enquiry</option>
+          <option>Deployment &amp; Integration</option>
+          <option>IBM Hackathon Collaboration</option>
+          <option>Technical Question</option>
+          <option>Partnership Opportunity</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Organisation / Team</label>
+        <input class="form-input" placeholder="Your organisation or team name"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Message</label>
+        <textarea class="form-textarea" style="min-height:140px" placeholder="Your message..."></textarea>
+      </div>
+      <button class="btn btn-primary btn-block mt-2" onclick="this.textContent='✓ Sent! (Demo)';setTimeout(()=>this.textContent='Send Message →',3000)">Send Message →</button>
+      <p style="font-size:11px;color:var(--muted);margin-top:12px;text-align:center">This is a demonstration project. Contact form is for demo purposes.</p>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-logo">🌪️ <span>AI Cyclone EWS</span> · IBM watsonx.ai · Granite-4</div>
+  <div class="footer-links">
+    <a href="/static/index.html">Home</a>
+    <a href="/static/agents.html">Agents</a>
+    <a href="/static/dashboard.html">Dashboard</a>
+    <a href="/static/about.html">About</a>
+  </div>
+  <div class="footer-copy">© 2026 IBM Hackathon Project · AI-Driven Disaster Management</div>
+</footer>
+
+<script src="/static/js/shared.js"></script>
+</body>
+</html>
