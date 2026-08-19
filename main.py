@@ -7,6 +7,7 @@ from __future__ import annotations
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import Optional
 import os
@@ -31,10 +32,37 @@ def _handle(fn):
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"{type(exc).__name__}: {exc}")
 
+
 app = FastAPI(
     title="AI-Driven Cyclone & Coastal Disaster Early Warning System",
     description="Multi-agent IBM Watsonx.ai powered disaster management API",
     version="1.0.0",
+)
+
+# ============================================================
+# CORS — allow local dev + GitHub Pages frontend
+# ============================================================
+_allowed_origins = [
+    "http://localhost:8000",
+    "http://localhost:3000",
+    "http://127.0.0.1:8000",
+    "http://127.0.0.1:3000",
+    "https://yolojay.github.io",          # GitHub Pages root
+    # Add any other frontend origin here, e.g.:
+    # "https://your-custom-domain.com",
+]
+
+# Allow any extra origins set via environment variable (space-separated)
+_extra = os.environ.get("ALLOWED_ORIGINS", "")
+if _extra:
+    _allowed_origins += [o.strip() for o in _extra.split() if o.strip()]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_allowed_origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 # Mount static files (frontend)

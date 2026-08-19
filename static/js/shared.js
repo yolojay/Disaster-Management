@@ -1,6 +1,8 @@
 /**
  * AI Cyclone & Coastal Disaster Early Warning System
  * Shared JavaScript — Navigation, AI calls, formatters
+ *
+ * API_BASE_URL is defined in api-config.js (loaded before this file).
  */
 
 /* ═══════════════════════════════════════════════════════
@@ -21,11 +23,12 @@
       ham.addEventListener('click', () => mob.classList.toggle('open'));
     }
 
-    // mark active link
-    const path = location.pathname.replace(/\/$/, '') || '/';
+    // mark active link — works for both /static/page.html and /Disaster-Management/page.html
+    const path = location.pathname;
     document.querySelectorAll('.nav-link[data-page]').forEach(el => {
-      const p = el.getAttribute('data-page');
-      if (path.endsWith(p) || (path === '/' && p === '/index.html') || (path === '' && p === '/index.html')) {
+      const p = el.getAttribute('data-page'); // e.g. "index.html"
+      if (path.endsWith(p) || path.endsWith(p.replace('.html', '')) ||
+          (path === '/' && p === 'index.html')) {
         el.classList.add('active');
       }
     });
@@ -78,6 +81,8 @@ function formatAIOutput(text) {
    GENERIC AGENT RUNNER
 ═══════════════════════════════════════════════════════ */
 async function runAgent({ url, body, outputId, processingId, timerId }) {
+  // Prepend API base URL — supports both localhost and public backend
+  const fullUrl = (typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '') + url;
   const procEl = document.getElementById(processingId);
   const outEl  = document.getElementById(outputId);
   const timeEl = document.getElementById(timerId);
@@ -94,7 +99,7 @@ async function runAgent({ url, body, outputId, processingId, timerId }) {
   }
 
   try {
-    const res  = await fetch(url, {
+    const res  = await fetch(fullUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -119,7 +124,14 @@ async function runAgent({ url, body, outputId, processingId, timerId }) {
     clearInterval(tick);
     if (procEl) procEl.classList.remove('visible');
     if (outEl) {
-      outEl.innerHTML = `<div style="color:var(--red2);padding:14px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:8px;">⚠️ Error: ${e.message}</div>`;
+      const isNetwork = e instanceof TypeError && e.message.includes('fetch');
+      const msg = isNetwork
+        ? 'AI backend is currently unavailable. Please try again shortly.'
+        : e.message;
+      outEl.innerHTML = `<div style="color:var(--red2);padding:14px 16px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:8px;line-height:1.6;">
+        ⚠️ <strong>Error:</strong> ${msg}
+        ${isNetwork ? `<div style="margin-top:8px;font-size:11px;color:#64748b;">Attempted: <code>${fullUrl}</code></div>` : ''}
+      </div>`;
       outEl.classList.add('visible');
     }
   }
@@ -129,6 +141,7 @@ async function runAgent({ url, body, outputId, processingId, timerId }) {
    ORCHESTRATION RUNNER
 ═══════════════════════════════════════════════════════ */
 async function runOrchestration({ url, body, outputId, processingId, timerId }) {
+  const fullUrl = (typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '') + url;
   const procEl = document.getElementById(processingId);
   const outEl  = document.getElementById(outputId);
   const timeEl = document.getElementById(timerId);
@@ -145,7 +158,7 @@ async function runOrchestration({ url, body, outputId, processingId, timerId }) 
   }
 
   try {
-    const res  = await fetch(url, {
+    const res  = await fetch(fullUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -194,7 +207,14 @@ async function runOrchestration({ url, body, outputId, processingId, timerId }) 
     clearInterval(tick);
     if (procEl) procEl.classList.remove('visible');
     if (outEl) {
-      outEl.innerHTML = `<div style="color:var(--red2);padding:16px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;">⚠️ Orchestration error: ${e.message}</div>`;
+      const isNetwork = e instanceof TypeError && e.message.includes('fetch');
+      const msg = isNetwork
+        ? 'AI backend is currently unavailable. Please try again shortly.'
+        : e.message;
+      outEl.innerHTML = `<div style="color:var(--red2);padding:16px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;line-height:1.6;">
+        ⚠️ <strong>Orchestration error:</strong> ${msg}
+        ${isNetwork ? `<div style="margin-top:8px;font-size:11px;color:#64748b;">Attempted: <code>${fullUrl}</code></div>` : ''}
+      </div>`;
       outEl.classList.add('visible');
     }
   }
